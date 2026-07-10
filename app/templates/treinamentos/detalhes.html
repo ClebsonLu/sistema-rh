@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ treinamento.titulo }} - Treinamento - Sistema RH{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
+        <h4><i class="bi bi-mortarboard"></i> {{ treinamento.titulo }}</h4>
+        <p>{{ treinamento.carga_horaria }}h | {{ treinamento.local or 'A definir' }}</p>
+    </div>
+    <a href="{{ url_for('treinamentos.inscrever', id=treinamento.id) }}" class="btn btn-primary"><i class="bi bi-person-plus"></i> Inscrever</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Detalhes</div>
+            <div class="card-body">
+                <table class="table">
+                    <tr><th>Titulo</th><td>{{ treinamento.titulo }}</td></tr>
+                    <tr><th>Descricao</th><td>{{ treinamento.descricao or '-' }}</td></tr>
+                    <tr><th>Inicio</th><td>{{ treinamento.data_inicio.strftime('%d/%m/%Y') }}</td></tr>
+                    <tr><th>Fim</th><td>{{ treinamento.data_fim.strftime('%d/%m/%Y') if treinamento.data_fim else '-' }}</td></tr>
+                    <tr><th>Vagas</th><td>{{ capacitacoes|length }}/{{ treinamento.vagas_max }}</td></tr>
+                    <tr><th>Status</th><td><span class="badge bg-{{ 'success' if treinamento.status == 'Aberto' else 'warning' }}">{{ treinamento.status }}</span></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Inscritos ({{ capacitacoes|length }})</div>
+            <div class="card-body">
+                {% for c in capacitacoes %}
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2" style="background: var(--primary-container); border-radius: 8px;">
+                    <div><strong>{{ c.funcionario.nome }}</strong><br><small>{{ c.status }}</small></div>
+                    {% if c.nota_final %}
+                    <span class="badge bg-{{ 'success' if c.nota_final >= 7 else 'danger' }}">{{ c.nota_final }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% if not capacitacoes %}
+                <p class="text-muted">Nenhum inscrito</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<a href="{{ url_for('treinamentos.listar') }}" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Voltar</a>
+{% endblock %}

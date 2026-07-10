@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Enviar Documento - Sistema RH{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-upload"></i> Enviar Documento</h4>
+</div>
+<div class="card" style="max-width: 600px;">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Funcionario *</label>
+                <select class="form-select" name="funcionario_id" required>
+                    <option value="">Selecione...</option>
+                    {% for f in funcionarios %}
+                    <option value="{{ f.id }}">{{ f.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Titulo *</label>
+                <input type="text" class="form-control" name="titulo" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Categoria</label>
+                <select class="form-select" name="categoria">
+                    {% for c in ["Geral","Contrato","Documento Pessoal","Certificado","Relatorio","Atestado","PDF","Imagem"] %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Arquivo</label>
+                <input type="file" class="form-control" name="arquivo" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Descricao</label>
+                <textarea class="form-control" name="descricao" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i> Enviar</button>
+            <a href="{{ url_for('documentos.listar') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

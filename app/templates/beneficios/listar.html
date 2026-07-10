@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Beneficios - Sistema RH{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
+        <h4><i class="bi bi-gift"></i> Beneficios</h4>
+        <p>Gerencie os beneficios da empresa</p>
+    </div>
+    <div>
+        <a href="{{ url_for('beneficios.cadastrar') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo Beneficio</a>
+        <a href="{{ url_for('beneficios.vincular') }}" class="btn btn-outline-primary"><i class="bi bi-link"></i> Vincular a Funcionario</a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">Beneficios Cadastrados</div>
+    <div class="card-body">
+        {% if beneficios %}
+        <table class="table">
+            <thead><tr><th>Nome</th><th>Tipo</th><th>Valor Padrao</th><th>Vinculados</th><th>Acoes</th></tr></thead>
+            <tbody>
+            {% for b in beneficios %}
+            <tr>
+                <td>{{ b.nome }}</td>
+                <td><span class="badge bg-primary">{{ b.tipo }}</span></td>
+                <td>R$ {{ "%.2f"|format(b.valor_padrao) }}</td>
+                <td>{{ b.vinculados|selectattr('status', 'equalto', 'Ativo')|list|length }}</td>
+                <td>
+                    <a href="{{ url_for('beneficios.editar', id=b.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                    <form method="POST" action="{{ url_for('beneficios.excluir', id=b.id) }}" class="d-inline" onsubmit="return confirm('Excluir?')">
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-gift"></i><p>Nenhum beneficio cadastrado</p></div>
+        {% endif %}
+    </div>
+</div>
+
+{% if vinculados %}
+<div class="card">
+    <div class="card-header">Funcionarios com Beneficios</div>
+    <div class="card-body">
+        <table class="table">
+            <thead><tr><th>Funcionario</th><th>Beneficio</th><th>Valor</th><th>Inicio</th><th>Status</th><th>Acao</th></tr></thead>
+            <tbody>
+            {% for v in vinculados %}
+            <tr>
+                <td>{{ v.funcionario.nome }}</td>
+                <td>{{ v.beneficio.nome }}</td>
+                <td>R$ {{ "%.2f"|format(v.valor) }}</td>
+                <td>{{ v.data_inicio.strftime('%d/%m/%Y') }}</td>
+                <td><span class="badge bg-success">{{ v.status }}</span></td>
+                <td>
+                    <form method="POST" action="{{ url_for('beneficios.desvincular', id=v.id) }}">
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Remover</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

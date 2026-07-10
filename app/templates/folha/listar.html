@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Folha de Pagamento - Sistema RH{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
+        <h4><i class="bi bi-cash-stack"></i> Folha de Pagamento</h4>
+        <p>Gerencie a folha de pagamento mensal</p>
+    </div>
+    <form method="POST" action="{{ url_for('folha.gerar') }}" class="d-flex gap-2">
+        <select class="form-select" name="mes" style="width: 150px;">
+            {% for m in range(1,13) %}
+            <option value="{{ m }}" {{ 'selected' if m == mes }}>{{ m }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" class="form-control" name="ano" value="{{ ano }}" style="width: 100px;">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-gear"></i> Gerar Folha</button>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="bi bi-cash"></i></div>
+            <div class="kpi-value" style="color: var(--primary);">{{ registros|length }}</div>
+            <div class="kpi-label">Registros</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="kpi-icon green"><i class="bi bi-check-circle"></i></div>
+            <div class="kpi-value" style="color: var(--accent-green);">R$ {{ "%.2f"|format(total_pago) }}</div>
+            <div class="kpi-label">Total Pago</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="kpi-icon orange"><i class="bi bi-hourglass"></i></div>
+            <div class="kpi-value" style="color: var(--accent-orange);">{{ registros|selectattr('status', 'equalto', 'Pendente')|list|length }}</div>
+            <div class="kpi-label">Pendentes</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Folha de {{ mes }}/{{ ano }}</div>
+    <div class="card-body">
+        {% if registros %}
+        <table class="table">
+            <thead><tr><th>Funcionario</th><th>Salario Bruto</th><th>Beneficios</th><th>Descontos</th><th>Liquido</th><th>Status</th><th>Acao</th></tr></thead>
+            <tbody>
+            {% for r in registros %}
+            <tr>
+                <td>{{ r.funcionario.nome }}</td>
+                <td>R$ {{ "%.2f"|format(r.salario_bruto) }}</td>
+                <td class="text-success">+R$ {{ "%.2f"|format(r.total_beneficios) }}</td>
+                <td class="text-danger">-R$ {{ "%.2f"|format(r.total_descontos) }}</td>
+                <td><strong>R$ {{ "%.2f"|format(r.salario_liquido) }}</strong></td>
+                <td>
+                    {% if r.status == "Pago" %}<span class="badge bg-success">Pago</span>
+                    {% elif r.status == "Cancelado" %}<span class="badge bg-danger">Cancelado</span>
+                    {% else %}<span class="badge bg-warning">Pendente</span>{% endif %}
+                </td>
+                <td>
+                    {% if r.status == "Pendente" %}
+                    <form method="POST" action="{{ url_for('folha.pagar', id=r.id) }}" class="d-inline">
+                        <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Pagar</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('folha.cancelar', id=r.id) }}" class="d-inline">
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i></button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-cash-stack"></i><p>Nenhum registro para este periodo</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

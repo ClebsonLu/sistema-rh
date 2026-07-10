@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Inscrever - Treinamento - Sistema RH{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-person-plus"></i> Inscrever em: {{ treinamento.titulo }}</h4>
+</div>
+<div class="card" style="max-width: 600px;">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Funcionario *</label>
+                <select class="form-select" name="funcionario_id" required>
+                    <option value="">Selecione...</option>
+                    {% for f in funcionarios %}
+                    <option value="{{ f.id }}">{{ f.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Inscrever</button>
+            <a href="{{ url_for('treinamentos.detalhes', id=treinamento.id) }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

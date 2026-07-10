@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Avaliacao #{{ avaliacao.id }} - Sistema RH{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-clipboard-check"></i> Avaliacao de Desempenho</h4>
+</div>
+<div class="card" style="max-width: 700px;">
+    <div class="card-body">
+        <table class="table">
+            <tr><th>Funcionario</th><td>{{ avaliacao.funcionario.nome }}</td></tr>
+            <tr><th>Avaliador</th><td>{{ avaliacao.avaliador.nome }}</td></tr>
+            <tr><th>Periodo</th><td>{{ avaliacao.periodo }}</td></tr>
+            <tr><th>Nota Geral</th><td><span class="badge bg-{{ 'success' if avaliacao.nota_geral >= 7 else 'warning' if avaliacao.nota_geral >= 5 else 'danger' }}" style="font-size: 1rem;">{{ "%.1f"|format(avaliacao.nota_geral) }}</span></td></tr>
+            <tr><th>Competencias</th><td>{{ avaliacao.competencias or '-' }}</td></tr>
+            <tr><th>Observacoes</th><td>{{ avaliacao.observacoes or '-' }}</td></tr>
+            <tr><th>Status</th><td><span class="badge bg-{{ 'success' if avaliacao.status == 'Concluida' else 'warning' }}">{{ avaliacao.status }}</span></td></tr>
+            <tr><th>Data</th><td>{{ avaliacao.data_avaliacao.strftime('%d/%m/%Y') }}</td></tr>
+        </table>
+    </div>
+</div>
+<a href="{{ url_for('avaliacoes.listar') }}" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Voltar</a>
+<a href="{{ url_for('avaliacoes.editar', id=avaliacao.id) }}" class="btn btn-primary mt-3"><i class="bi bi-pencil"></i> Editar</a>
+{% endblock %}

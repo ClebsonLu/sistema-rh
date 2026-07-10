@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Departamento{% endblock %}
+{% block content %}
+<h2 class="mb-3">{{ "Editar" if departamento else "Cadastrar" }} Departamento</h2>
+<form method="post" class="row g-3">
+    <div class="col-md-6"><label class="form-label">Nome *</label>
+        <input type="text" name="nome" class="form-control" value="{{ departamento.nome if departamento else '' }}" required></div>
+    <div class="col-md-6"><label class="form-label">Descricao</label>
+        <textarea name="descricao" class="form-control">{{ departamento.descricao if departamento else '' }}</textarea></div>
+    <div class="col-12"><button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Salvar</button>
+        <a href="{{ url_for('departamentos.listar') }}" class="btn btn-secondary">Cancelar</a></div>
+</form>
+{% endblock %}

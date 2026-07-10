@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Candidatos - Sistema RH{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
+        <h4><i class="bi bi-people"></i> Candidatos</h4>
+    </div>
+    <a href="{{ url_for('recrutamento.cadastrar_candidato') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo Candidato</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        {% if candidatos %}
+        <table class="table">
+            <thead><tr><th>Nome</th><th>Email</th><th>Vaga</th><th>Data</th><th>Status</th><th>Acao</th></tr></thead>
+            <tbody>
+            {% for c in candidatos %}
+            <tr>
+                <td>{{ c.nome }}</td>
+                <td>{{ c.email or '-' }}</td>
+                <td>{{ c.vaga.titulo }}</td>
+                <td>{{ c.data_candidatura.strftime('%d/%m/%Y') }}</td>
+                <td><span class="badge bg-{{ 'success' if c.status == 'Aprovado' else 'danger' if c.status == 'Rejeitado' else 'warning' }}">{{ c.status }}</span></td>
+                <td>
+                    <form method="POST" action="{{ url_for('recrutamento.status_candidato', id=c.id) }}" class="d-flex gap-1">
+                        <select name="status" class="form-select form-select-sm" style="width: 130px;">
+                            {% for s in ["Novo","Em_Analise","Aprovado","Rejeitado"] %}
+                            <option value="{{ s }}" {{ 'selected' if c.status == s }}>{{ s }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-sm btn-primary"><i class="bi bi-check"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-people"></i><p>Nenhum candidato cadastrado</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

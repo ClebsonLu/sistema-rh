@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema RH{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="d-flex">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <h5><i class="bi bi-building"></i> Sistema RH</h5>
+                <small>Gestao de Pessoas</small>
+            </div>
+            <div class="sidebar-nav">
+                <ul class="nav flex-column px-2">
+                    <li class="nav-section">Principal</li>
+                    <li><a class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}" href="{{ url_for('dashboard.index') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li><a class="nav-link {% if 'funcionarios' in request.endpoint %}active{% endif %}" href="{{ url_for('funcionarios.listar') }}"><i class="bi bi-people"></i> Funcionarios</a></li>
+                    <li><a class="nav-link {% if 'departamentos' in request.endpoint %}active{% endif %}" href="{{ url_for('departamentos.listar') }}"><i class="bi bi-diagram-3"></i> Departamentos</a></li>
+                    <li><a class="nav-link {% if 'cargos' in request.endpoint %}active{% endif %}" href="{{ url_for('cargos.listar') }}"><i class="bi bi-person-badge"></i> Cargos</a></li>
+
+                    <li class="nav-section">Gestao</li>
+                    <li><a class="nav-link {% if 'ferias' in request.endpoint %}active{% endif %}" href="{{ url_for('ferias.listar') }}"><i class="bi bi-calendar-check"></i> Ferias</a></li>
+                    <li><a class="nav-link {% if 'ponto' in request.endpoint %}active{% endif %}" href="{{ url_for('ponto.historico') }}"><i class="bi bi-clock-history"></i> Ponto</a></li>
+                    <li><a class="nav-link {% if 'beneficios' in request.endpoint %}active{% endif %}" href="{{ url_for('beneficios.listar') }}"><i class="bi bi-gift"></i> Beneficios</a></li>
+                    <li><a class="nav-link {% if 'folha' in request.endpoint %}active{% endif %}" href="{{ url_for('folha.listar') }}"><i class="bi bi-cash-stack"></i> Folha Pagamento</a></li>
+
+                    <li class="nav-section">Pessoal</li>
+                    <li><a class="nav-link {% if 'recrutamento' in request.endpoint %}active{% endif %}" href="{{ url_for('recrutamento.listar_vagas') }}"><i class="bi bi-briefcase"></i> Recrutamento</a></li>
+                    <li><a class="nav-link {% if 'treinamentos' in request.endpoint %}active{% endif %}" href="{{ url_for('treinamentos.listar') }}"><i class="bi bi-mortarboard"></i> Treinamentos</a></li>
+                    <li><a class="nav-link {% if 'avaliacoes' in request.endpoint %}active{% endif %}" href="{{ url_for('avaliacoes.listar') }}"><i class="bi bi-clipboard-check"></i> Avaliacoes</a></li>
+
+                    <li class="nav-section">Sistema</li>
+                    <li><a class="nav-link {% if 'documentos' in request.endpoint %}active{% endif %}" href="{{ url_for('documentos.listar') }}"><i class="bi bi-file-earmark-arrow-up"></i> Documentos</a></li>
+                    <li><a class="nav-link {% if 'bi' in request.endpoint %}active{% endif %}" href="{{ url_for('bi.index') }}"><i class="bi bi-graph-up"></i> BI / Analytics</a></li>
+                    <li><a class="nav-link {% if 'relatorios' in request.endpoint %}active{% endif %}" href="{{ url_for('relatorios.index') }}"><i class="bi bi-file-earmark-bar-graph"></i> Relatorios</a></li>
+                    <li class="nav-section mt-2">Conta</li>
+                    <li><a class="nav-link {% if 'change_password' in request.endpoint %}active{% endif %}" href="{{ url_for('auth.change_password') }}"><i class="bi bi-key"></i> Alterar Senha</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-footer px-3 py-3" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-circle me-2" style="font-size: 1.5rem; color: var(--primary-light);"></i>
+                        <div>
+                            <small class="text-white d-block">{{ session.get('nome_completo', session.get('username', 'User')) }}</small>
+                            <small style="color: var(--primary-light);">{{ 'Admin' if session.get('is_admin') else 'Usuario' }}</small>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('auth.logout') }}" class="text-white" title="Sair"><i class="bi bi-box-arrow-right" style="font-size: 1.2rem;"></i></a>
+                </div>
+            </div>
+        </nav>
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }} alert-dismissible fade show">{{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

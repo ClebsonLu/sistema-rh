@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Relatorios{% endblock %}
+{% block content %}
+<h2 class="mb-4">Relatorios</h2>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-file-earmark-pdf"></i> Relatorio de Funcionarios (PDF)</h5>
+                <p class="card-text">Lista todos os funcionarios ativos e inativos.</p>
+                <a href="{{ url_for('relatorios.funcionarios_pdf') }}" class="btn btn-danger"><i class="bi bi-download"></i> Baixar PDF</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-file-earmark-excel"></i> Folha de Pagamento (Excel)</h5>
+                <p class="card-text">Exporta folha de pagamento em formato Excel.</p>
+                <a href="{{ url_for('relatorios.folha_excel') }}" class="btn btn-success"><i class="bi bi-download"></i> Baixar Excel</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-file-earmark-pdf"></i> Relatorio de Ponto (PDF)</h5>
+                <p class="card-text">Registros de ponto dos funcionarios.</p>
+                <a href="{{ url_for('relatorios.ponto_pdf') }}" class="btn btn-info"><i class="bi bi-download"></i> Baixar PDF</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

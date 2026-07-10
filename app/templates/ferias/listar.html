@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Ferias{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h2>Solicitacoes de Ferias</h2>
+    <a href="{{ url_for('ferias.solicitar') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nova Solicitacao</a>
+</div>
+<div class="mb-3">
+    <a href="{{ url_for('ferias.listar') }}" class="btn btn-sm {{ 'btn-primary' if not status_filtro else 'btn-outline-primary' }}">Todos</a>
+    <a href="{{ url_for('ferias.listar', status='Pendente') }}" class="btn btn-sm {{ 'btn-warning' if status_filtro == 'Pendente' else 'btn-outline-warning' }}">Pendentes</a>
+    <a href="{{ url_for('ferias.listar', status='Aprovada') }}" class="btn btn-sm {{ 'btn-success' if status_filtro == 'Aprovada' else 'btn-outline-success' }}">Aprovadas</a>
+    <a href="{{ url_for('ferias.listar', status='Rejeitada') }}" class="btn btn-sm {{ 'btn-danger' if status_filtro == 'Rejeitada' else 'btn-outline-danger' }}">Rejeitadas</a>
+</div>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Funcionario</th><th>Periodo</th><th>Dias</th><th>Status</th><th>Acoes</th></tr></thead>
+    <tbody>
+    {% for f in ferias %}
+    <tr>
+        <td>{{ f.funcionario.nome }}</td>
+        <td>{{ f.data_inicio.strftime('%d/%m/%Y') }} a {{ f.data_fim.strftime('%d/%m/%Y') }}</td>
+        <td>{{ f.dias }}</td>
+        <td><span class="badge bg-{{ 'warning' if f.status == 'Pendente' else 'success' if f.status == 'Aprovada' else 'danger' }}">{{ f.status }}</span></td>
+        <td>
+            {% if f.status == 'Pendente' %}
+            <form method="post" action="{{ url_for('ferias.aprovar', id=f.id) }}" class="d-inline">
+                <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
+            </form>
+            <form method="post" action="{{ url_for('ferias.rejeitar', id=f.id) }}" class="d-inline">
+                <button class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i></button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

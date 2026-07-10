@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Departamentos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h2>Departamentos</h2>
+    <a href="{{ url_for('departamentos.cadastrar') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Novo</a>
+</div>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Nome</th><th>Descricao</th><th>Acoes</th></tr></thead>
+    <tbody>
+    {% for d in departamentos %}
+    <tr>
+        <td>{{ d.nome }}</td>
+        <td>{{ d.descricao or '-' }}</td>
+        <td>
+            <a href="{{ url_for('departamentos.editar', id=d.id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+            <form method="post" action="{{ url_for('departamentos.excluir', id=d.id) }}" class="d-inline" onsubmit="return confirm('Excluir este departamento?')">
+                <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

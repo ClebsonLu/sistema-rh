@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Historico de Ponto{% endblock %}
+{% block content %}
+<h2 class="mb-3">Historico de Ponto</h2>
+<form class="row g-2 mb-3" method="get">
+    <div class="col-auto"><select name="funcionario_id" class="form-select">
+        <option value="">Todos</option>
+        {% for f in funcionarios %}<option value="{{ f.id }}" {{ 'selected' if f.id == funcionario_id }}>{{ f.nome }}</option>{% endfor %}
+    </select></div>
+    <div class="col-auto"><select name="mes" class="form-select">
+        {% for m in range(1,13) %}<option value="{{ m }}" {{ 'selected' if m == mes }}>{{ m }}</option>{% endfor %}
+    </select></div>
+    <div class="col-auto"><input type="number" name="ano" class="form-control" value="{{ ano }}" min="2020" max="2030"></div>
+    <div class="col-auto"><button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Filtrar</button></div>
+</form>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Funcionario</th><th>Data</th><th>Entrada</th><th>Saida</th><th>Observacao</th></tr></thead>
+    <tbody>
+    {% for r in registros %}
+    <tr>
+        <td>{{ r.funcionario.nome }}</td>
+        <td>{{ r.data.strftime('%d/%m/%Y') }}</td>
+        <td>{{ r.entrada.strftime('%H:%M') }}</td>
+        <td>{{ r.saida.strftime('%H:%M') if r.saida else '-' }}</td>
+        <td>{{ r.observacao or '-' }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('ponto.registrar') }}" class="btn btn-primary"><i class="bi bi-clock"></i> Registrar Ponto</a>
+{% endblock %}

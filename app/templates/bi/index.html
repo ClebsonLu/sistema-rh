@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}BI / Analytics - Sistema RH{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-graph-up"></i> BI / Analytics</h4>
+    <p>Painel de analises e indicadores</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="bi bi-star"></i></div>
+            <div class="kpi-value" style="color: var(--primary);">{{ notas_avaliacao }}</div>
+            <div class="kpi-label">Nota Media Avaliacoes</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> Funcionarios por Departamento</div>
+            <div class="card-body">
+                <canvas id="chartDept" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart"></i> Vagas por Status</div>
+            <div class="card-body">
+                <canvas id="chartVagas" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> Treinamentos por Status</div>
+            <div class="card-body">
+                <canvas id="chartTrein" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-line-chart"></i> Ferias por Mes</div>
+            <div class="card-body">
+                <canvas id="chartFerias" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-cash-stack"></i> Folha de Pagamento por Mes</div>
+            <div class="card-body">
+                <canvas id="chartFolha" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+new Chart(document.getElementById('chartDept'), {
+    type: 'bar',
+    data: {
+        labels: [{% for nome, count in funcionarios_por_dept %}'{{ nome }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{ label: 'Funcionarios', data: [{% for nome, count in funcionarios_por_dept %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}], backgroundColor: 'rgba(124, 58, 237, 0.7)', borderRadius: 8 }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+
+new Chart(document.getElementById('chartVagas'), {
+    type: 'doughnut',
+    data: {
+        labels: [{% for status, count in vagas_por_status %}'{{ status }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{ data: [{% for status, count in vagas_por_status %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}], backgroundColor: ['#7c3aed', '#f97316', '#22c55e', '#3b82f6', '#ef4444'] }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+new Chart(document.getElementById('chartTrein'), {
+    type: 'pie',
+    data: {
+        labels: [{% for status, count in treinamentos_por_status %}'{{ status }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{ data: [{% for status, count in treinamentos_por_status %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}], backgroundColor: ['#7c3aed', '#f97316', '#22c55e', '#3b82f6'] }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+new Chart(document.getElementById('chartFerias'), {
+    type: 'line',
+    data: {
+        labels: [{% for mes, count in ferias_por_month %}'{{ mes }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{ label: 'Ferias', data: [{% for mes, count in ferias_por_month %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}], borderColor: '#7c3aed', backgroundColor: 'rgba(124, 58, 237, 0.1)', fill: true, tension: 0.4 }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById('chartFolha'), {
+    type: 'bar',
+    data: {
+        labels: [{% for periodo, valor in folha_por_month %}'{{ periodo }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{ label: 'Total Pago', data: [{% for periodo, valor in folha_por_month %}{{ valor }}{% if not loop.last %},{% endif %}{% endfor %}], backgroundColor: 'rgba(34, 197, 94, 0.7)', borderRadius: 8 }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+</script>
+{% endblock %}

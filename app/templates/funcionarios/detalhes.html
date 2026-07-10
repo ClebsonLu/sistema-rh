@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ funcionario.nome }} - Detalhes{% endblock %}
+{% block content %}
+<h2 class="mb-3">{{ funcionario.nome }}</h2>
+<div class="row">
+    <div class="col-md-6">
+        <table class="table">
+            <tr><th>CPF</th><td>{{ funcionario.cpf }}</td></tr>
+            <tr><th>Email</th><td>{{ funcionario.email or '-' }}</td></tr>
+            <tr><th>Telefone</th><td>{{ funcionario.telefone or '-' }}</td></tr>
+            <tr><th>Data Nascimento</th><td>{{ funcionario.data_nascimento.strftime('%d/%m/%Y') if funcionario.data_nascimento else '-' }}</td></tr>
+            <tr><th>Data Admissao</th><td>{{ funcionario.data_admissao.strftime('%d/%m/%Y') }}</td></tr>
+            <tr><th>Departamento</th><td>{{ funcionario.departamento.nome }}</td></tr>
+            <tr><th>Cargo</th><td>{{ funcionario.cargo.nome }}</td></tr>
+            <tr><th>Salario</th><td>R$ {{ "%.2f"|format(funcionario.salario) }}</td></tr>
+            <tr><th>Status</th><td><span class="badge bg-{{ 'success' if funcionario.status == 'Ativo' else 'secondary' }}">{{ funcionario.status }}</span></td></tr>
+        </table>
+    </div>
+</div>
+<a href="{{ url_for('funcionarios.editar', id=funcionario.id) }}" class="btn btn-warning"><i class="bi bi-pencil"></i> Editar</a>
+<a href="{{ url_for('funcionarios.listar') }}" class="btn btn-secondary">Voltar</a>
+{% endblock %}

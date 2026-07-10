@@ -1,0 +1,37 @@
+﻿{% extends "base.html" %}
+{% block title %}Funcionarios{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h2>Funcionarios</h2>
+    <a href="{{ url_for('funcionarios.cadastrar') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Novo</a>
+</div>
+<form class="row g-2 mb-3" method="get">
+    <div class="col-auto"><input type="text" name="busca" class="form-control" placeholder="Buscar nome..." value="{{ busca }}"></div>
+    <div class="col-auto"><button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button></div>
+</form>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Nome</th><th>CPF</th><th>Departamento</th><th>Cargo</th><th>Status</th><th>Acoes</th></tr></thead>
+    <tbody>
+    {% for f in funcionarios %}
+    <tr>
+        <td>{{ f.nome }}</td><td>{{ f.cpf }}</td>
+        <td>{{ f.departamento.nome if f.departamento else '-' }}</td>
+        <td>{{ f.cargo.nome if f.cargo else '-' }}</td>
+        <td><span class="badge bg-{{ 'success' if f.status == 'Ativo' else 'secondary' }}">{{ f.status }}</span></td>
+        <td>
+            <a href="{{ url_for('funcionarios.detalhes', id=f.id) }}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+            <a href="{{ url_for('funcionarios.editar', id=f.id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% if pagination.pages > 1 %}
+<nav><ul class="pagination">
+    {% for p in pagination.iter_pages() %}
+    {% if p %}<li class="page-item"><a class="page-link" href="?page={{ p }}&busca={{ busca }}">{{ p }}</a></li>
+    {% else %}<li class="page-item disabled"><span class="page-link">...</span></li>{% endif %}
+    {% endfor %}
+</ul></nav>
+{% endif %}
+{% endblock %}

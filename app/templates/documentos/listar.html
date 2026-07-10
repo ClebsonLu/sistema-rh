@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Documentos - Sistema RH{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
+        <h4><i class="bi bi-file-earmark-arrow-up"></i> Documentos</h4>
+        <p>Gerencie documentos dos funcionarios</p>
+    </div>
+    <a href="{{ url_for('documentos.upload') }}" class="btn btn-primary"><i class="bi bi-upload"></i> Enviar Documento</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="bi bi-file-earmark"></i></div>
+            <div class="kpi-value" style="color: var(--primary);">{{ documentos|length }}</div>
+            <div class="kpi-label">Total Documentos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon green"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div class="kpi-value" style="color: var(--accent-green);">{{ documentos|selectattr('categoria', 'equalto', 'PDF')|list|length }}</div>
+            <div class="kpi-label">PDFs</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon orange"><i class="bi bi-file-earmark-image"></i></div>
+            <div class="kpi-value" style="color: var(--accent-orange);">{{ documentos|selectattr('categoria', 'equalto', 'Imagem')|list|length }}</div>
+            <div class="kpi-label">Imagens</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon blue"><i class="bi bi-file-earmark-text"></i></div>
+            <div class="kpi-value" style="color: var(--accent-blue);">{{ documentos|selectattr('categoria', 'equalto', 'Contrato')|list|length }}</div>
+            <div class="kpi-label">Contratos</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Documentos</div>
+    <div class="card-body">
+        {% if documentos %}
+        <table class="table">
+            <thead><tr><th>Titulo</th><th>Funcionario</th><th>Categoria</th><th>Data</th><th>Acoes</th></tr></thead>
+            <tbody>
+            {% for d in documentos %}
+            <tr>
+                <td>{{ d.titulo }}</td>
+                <td>{{ d.funcionario.nome }}</td>
+                <td><span class="badge bg-primary">{{ d.categoria }}</span></td>
+                <td>{{ d.data_upload.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    {% if d.arquivo_path %}
+                    <a href="{{ url_for('documentos.download', id=d.id) }}" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i></a>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('documentos.excluir', id=d.id) }}" class="d-inline" onsubmit="return confirm('Excluir?')">
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-file-earmark-arrow-up"></i><p>Nenhum documento cadastrado</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

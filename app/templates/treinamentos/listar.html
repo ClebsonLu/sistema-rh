@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Treinamentos - Sistema RH{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
+        <h4><i class="bi bi-mortarboard"></i> Treinamentos</h4>
+        <p>Gerencie treinamentos e capacitacoes</p>
+    </div>
+    <a href="{{ url_for('treinamentos.cadastrar') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo Treinamento</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="bi bi-book"></i></div>
+            <div class="kpi-value" style="color: var(--primary);">{{ treinamentos|selectattr('status', 'equalto', 'Aberto')|list|length }}</div>
+            <div class="kpi-label">Abertos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon green"><i class="bi bi-check-circle"></i></div>
+            <div class="kpi-value" style="color: var(--accent-green);">{{ treinamentos|selectattr('status', 'equalto', 'Concluido')|list|length }}</div>
+            <div class="kpi-label">Concluidos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon orange"><i class="bi bi-people"></i></div>
+            <div class="kpi-value" style="color: var(--accent-orange);">{{ total_inscritos }}</div>
+            <div class="kpi-label">Total Inscritos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon blue"><i class="bi bi-clock"></i></div>
+            <div class="kpi-value" style="color: var(--accent-blue);">{{ treinamentos|sum(attribute='carga_horaria') if treinamentos else 0 }}h</div>
+            <div class="kpi-label">Carga Total</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Lista de Treinamentos</div>
+    <div class="card-body">
+        {% if treinamentos %}
+        <table class="table">
+            <thead><tr><th>Titulo</th><th>Carga</th><th>Inicio</th><th>Local</th><th>Vagas</th><th>Status</th><th>Acoes</th></tr></thead>
+            <tbody>
+            {% for t in treinamentos %}
+            <tr>
+                <td><a href="{{ url_for('treinamentos.detalhes', id=t.id) }}">{{ t.titulo }}</a></td>
+                <td>{{ t.carga_horaria }}h</td>
+                <td>{{ t.data_inicio.strftime('%d/%m/%Y') }}</td>
+                <td>{{ t.local or '-' }}</td>
+                <td>{{ t.capacitacoes|length }}/{{ t.vagas_max }}</td>
+                <td>
+                    {% if t.status == "Aberto" %}<span class="badge bg-success">Aberto</span>
+                    {% elif t.status == "Em_Andamento" %}<span class="badge bg-warning">Em Andamento</span>
+                    {% else %}<span class="badge bg-secondary">Concluido</span>{% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('treinamentos.detalhes', id=t.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                    <a href="{{ url_for('treinamentos.editar', id=t.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                    <form method="POST" action="{{ url_for('treinamentos.excluir', id=t.id) }}" class="d-inline" onsubmit="return confirm('Excluir?')">
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-mortarboard"></i><p>Nenhum treinamento cadastrado</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

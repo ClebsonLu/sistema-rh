@@ -1,0 +1,157 @@
+﻿{% extends "base.html" %}
+{% block title %}Dashboard - Sistema RH{% endblock %}
+{% block content %}
+<div class="welcome-section">
+    <h4>Bom te ver por aqui!</h4>
+    <p><i class="bi bi-clipboard-data"></i> Prepare-se para uma jornada repleta de descobertas!</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="bi bi-people-fill"></i></div>
+            <div class="kpi-value" style="color: var(--primary);">{{ total_funcionarios }}</div>
+            <div class="kpi-label">Funcionarios Ativos</div>
+            <div class="kpi-sub">{{ total_inativos }} inativos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon orange"><i class="bi bi-calendar-x"></i></div>
+            <div class="kpi-value" style="color: var(--accent-orange);">{{ ferias_pendentes }}</div>
+            <div class="kpi-label">Ferias Pendentes</div>
+            <div class="kpi-sub">{{ ferias_aprovadas }} aprovadas</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon green"><i class="bi bi-clock-history"></i></div>
+            <div class="kpi-value" style="color: var(--accent-green);">{{ horas_mes }}h</div>
+            <div class="kpi-label">Horas no Mes</div>
+            <div class="kpi-sub">Registradas</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon blue"><i class="bi bi-briefcase"></i></div>
+            <div class="kpi-value" style="color: var(--accent-blue);">{{ vagas_abertas }}</div>
+            <div class="kpi-label">Vagas Abertas</div>
+            <div class="kpi-sub">Recrutamento</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon green"><i class="bi bi-mortarboard"></i></div>
+            <div class="kpi-value" style="color: var(--accent-green);">{{ treinamentos_ativos }}</div>
+            <div class="kpi-label">Treinamentos Ativos</div>
+            <div class="kpi-sub">Em andamento</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="bi bi-file-earmark"></i></div>
+            <div class="kpi-value" style="color: var(--primary);">{{ documentos_total }}</div>
+            <div class="kpi-label">Documentos</div>
+            <div class="kpi-sub">Cadastrados</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon orange"><i class="bi bi-clipboard-check"></i></div>
+            <div class="kpi-value" style="color: var(--accent-orange);">{{ avaliacoes_pendentes }}</div>
+            <div class="kpi-label">Avaliacoes Pendentes</div>
+            <div class="kpi-sub">A realizar</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-icon blue"><i class="bi bi-cash-stack"></i></div>
+            <div class="kpi-value" style="color: var(--accent-blue);">R$ {{ "%.2f"|format(folha_mes) }}</div>
+            <div class="kpi-label">Folha do Mes</div>
+            <div class="kpi-sub">Total pago</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> Funcionarios por Departamento</div>
+            <div class="card-body">
+                <canvas id="chartDept" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart"></i> Consolidado</div>
+            <div class="card-body">
+                <div class="stat-consolidated mb-3">
+                    <div class="stat-value">{{ total_funcionarios }}</div>
+                    <div class="stat-label">Ativos</div>
+                </div>
+                <div class="stat-consolidated mb-3">
+                    <div class="stat-value">{{ ferias_aprovadas }}</div>
+                    <div class="stat-label">Ferias Aprovadas</div>
+                </div>
+                <div class="stat-consolidated">
+                    <div class="stat-value">{{ horas_mes }}h</div>
+                    <div class="stat-label">Horas Trabalhadas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if aniversariantes %}
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-cake"></i> Aniversariantes do Mes</div>
+    <div class="card-body">
+        <div class="row">
+        {% for f in aniversariantes %}
+            <div class="col-md-3 mb-2">
+                <div class="d-flex align-items-center p-2" style="background: var(--primary-container); border-radius: 10px;">
+                    <i class="bi bi-person-circle me-2" style="font-size: 1.5rem; color: var(--primary);"></i>
+                    <div>
+                        <strong>{{ f.nome }}</strong><br>
+                        <small>{{ f.data_nascimento.strftime('%d/%m') }}</small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const ctx = document.getElementById('chartDept').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [{% for d, c in funcionarios_por_dept %}'{{ d }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Funcionarios',
+            data: [{% for d, c in funcionarios_por_dept %}{{ c }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: 'rgba(124, 58, 237, 0.7)',
+            borderColor: 'rgba(124, 58, 237, 1)',
+            borderWidth: 1,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+    }
+});
+</script>
+{% endblock %}

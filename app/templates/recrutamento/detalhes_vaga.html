@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ vaga.titulo }} - Vaga - Sistema RH{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-briefcase"></i> {{ vaga.titulo }}</h4>
+</div>
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Detalhes da Vaga</div>
+            <div class="card-body">
+                <table class="table">
+                    <tr><th>Titulo</th><td>{{ vaga.titulo }}</td></tr>
+                    <tr><th>Departamento</th><td>{{ vaga.departamento.nome }}</td></tr>
+                    <tr><th>Cargo</th><td>{{ vaga.cargo.nome }}</td></tr>
+                    <tr><th>Salario</th><td>R$ {{ "%.2f"|format(vaga.salario_oferecido) }}</td></tr>
+                    <tr><th>Status</th><td><span class="badge bg-{{ 'success' if vaga.status == 'Aberta' else 'warning' if vaga.status == 'Em_Analise' else 'secondary' }}">{{ vaga.status }}</span></td></tr>
+                    <tr><th>Abertura</th><td>{{ vaga.data_abertura.strftime('%d/%m/%Y') }}</td></tr>
+                    <tr><th>Descricao</th><td>{{ vaga.descricao or '-' }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Candidatos ({{ vaga.candidatos|length }})</div>
+            <div class="card-body">
+                {% for c in vaga.candidatos %}
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2" style="background: var(--primary-container); border-radius: 8px;">
+                    <div><strong>{{ c.nome }}</strong><br><small>{{ c.status }}</small></div>
+                    <span class="badge bg-{{ 'success' if c.status == 'Aprovado' else 'danger' if c.status == 'Rejeitado' else 'warning' }}">{{ c.status }}</span>
+                </div>
+                {% endfor %}
+                {% if not vaga.candidatos %}
+                <p class="text-muted">Nenhum candidato</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<a href="{{ url_for('recrutamento.listar_vagas') }}" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Voltar</a>
+{% endblock %}
