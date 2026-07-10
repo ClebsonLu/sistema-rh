@@ -13,6 +13,8 @@ class Config:
 
     if database_url:
         # PostgreSQL em producao (Railway, etc)
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
         SQLALCHEMY_DATABASE_URI = database_url
     else:
         # SQLite local para desenvolvimento
