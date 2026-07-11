@@ -6,7 +6,7 @@ from app.models import (
     FolhaPagamento
 )
 from datetime import date
-from sqlalchemy import func
+from sqlalchemy import func, extract
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -20,16 +20,29 @@ def index():
 
     hoje = date.today()
     primeiro_dia_mes = hoje.replace(day=1)
-    horas_mes = db.session.query(
-        func.sum(
-            func.julianday(RegistroPonto.saida) - func.julianday(RegistroPonto.entrada)
-        )
-    ).filter(
-        RegistroPonto.data >= primeiro_dia_mes,
-        RegistroPonto.data <= hoje,
-        RegistroPonto.saida.isnot(None)
-    ).scalar() or 0
-    horas_mes = horas_mes * 24
+
+    is_pg = db.engine.dialect.name == 'postgresql'
+    if is_pg:
+        horas_mes = db.session.query(
+            func.sum(
+                extract('epoch', RegistroPonto.saida - RegistroPonto.entrada) / 3600.0
+            )
+        ).filter(
+            RegistroPonto.data >= primeiro_dia_mes,
+            RegistroPonto.data <= hoje,
+            RegistroPonto.saida.isnot(None)
+        ).scalar() or 0
+    else:
+        horas_mes = db.session.query(
+            func.sum(
+                func.julianday(RegistroPonto.saida) - func.julianday(RegistroPonto.entrada)
+            )
+        ).filter(
+            RegistroPonto.data >= primeiro_dia_mes,
+            RegistroPonto.data <= hoje,
+            RegistroPonto.saida.isnot(None)
+        ).scalar() or 0
+        horas_mes = horas_mes * 24
 
     departamentos = Departamento.query.join(Funcionario, Funcionario.departamento_id == Departamento.id
     ).filter(Funcionario.status == "Ativo"

@@ -19,7 +19,10 @@ def create_app():
             Beneficio, FuncionarioBeneficio, FolhaPagamento,
             Vaga, Candidato, Treinamento, Capacitacao, Avaliacao, Documento,
         )
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception:
+            db.session.rollback()
 
         try:
             if not User.query.first():

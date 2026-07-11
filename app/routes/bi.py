@@ -5,7 +5,7 @@ from app.models import (
     FolhaPagamento, Vaga, Candidato, Treinamento, Capacitacao, Avaliacao
 )
 from datetime import date
-from sqlalchemy import func
+from sqlalchemy import func, extract, case, literal_column
 
 bi_bp = Blueprint("bi", __name__)
 
@@ -13,6 +13,7 @@ bi_bp = Blueprint("bi", __name__)
 @bi_bp.route("/")
 def index():
     hoje = date.today()
+    is_pg = db.engine.dialect.name == 'postgresql'
 
     funcionarios_por_dept = db.session.query(
         Departamento.nome, func.count(Funcionario.id)
@@ -20,11 +21,20 @@ def index():
     ).filter(Funcionario.status == "Ativo"
     ).group_by(Departamento.nome).all()
 
-    ferias_por_mes = db.session.query(
-        func.strftime("%m", Ferias.data_inicio), func.count(Ferias.id)
-    ).filter(
-        Ferias.data_inicio >= f"{hoje.year}-01-01"
-    ).group_by(func.strftime("%m", Ferias.data_inicio)).all()
+    if is_pg:
+        mes_inicio = extract('month', Ferias.data_inicio)
+        ferias_por_mes = db.session.query(
+            mes_inicio, func.count(Ferias.id)
+        ).filter(
+            Ferias.data_inicio >= f"{hoje.year}-01-01"
+        ).group_by(mes_inicio).all()
+        ferias_por_mes = [(str(int(m)), c) for m, c in ferias_por_mes]
+    else:
+        ferias_por_mes = db.session.query(
+            func.strftime("%m", Ferias.data_inicio), func.count(Ferias.id)
+        ).filter(
+            Ferias.data_inicio >= f"{hoje.year}-01-01"
+        ).group_by(func.strftime("%m", Ferias.data_inicio)).all()
 
     vagas_por_status = db.session.query(
         Vaga.status, func.count(Vaga.id)
@@ -38,12 +48,26 @@ def index():
         func.avg(Avaliacao.nota_geral)
     ).filter(Avaliacao.status != "Pendente").scalar() or 0
 
-    folha_por_mes = db.session.query(
-        func.strftime("%m-%Y", db.func.concat(FolhaPagamento.ano, "-", FolhaPagamento.mes, "-01")),
-        func.sum(FolhaPagamento.salario_liquido)
-    ).filter(
-        FolhaPagamento.status == "Pago"
-    ).group_by(func.strftime("%m-%Y", db.func.concat(FolhaPagamento.ano, "-", FolhaPagamento.mes, "-01"))).all()
+    if is_pg:
+        mes_ano_label = func.to_char(
+            func.to_date(
+                func.concat(FolhaPagamento.ano, '-', FolhaPagamento.mes, '-01'),
+                'YYYY-MM-DD'
+            ), 'MM-YYYY'
+        )
+        folha_por_mes = db.session.query(
+            mes_ano_label,
+            func.sum(FolhaPagamento.salario_liquido)
+        ).filter(
+            FolhaPagamento.status == "Pago"
+        ).group_by(mes_ano_label).all()
+    else:
+        folha_por_mes = db.session.query(
+            func.strftime("%m-%Y", db.func.concat(FolhaPagamento.ano, "-", FolhaPagamento.mes, "-01")),
+            func.sum(FolhaPagamento.salario_liquido)
+        ).filter(
+            FolhaPagamento.status == "Pago"
+        ).group_by(func.strftime("%m-%Y", db.func.concat(FolhaPagamento.ano, "-", FolhaPagamento.mes, "-01"))).all()
 
     return render_template("bi/index.html",
         funcionarios_por_dept=funcionarios_por_dept,
