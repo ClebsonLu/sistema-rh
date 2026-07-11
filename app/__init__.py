@@ -14,10 +14,14 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
+        from app.models import (
+            User, Departamento, Cargo, Funcionario, Ferias, RegistroPonto,
+            Beneficio, FuncionarioBeneficio, FolhaPagamento,
+            Vaga, Candidato, Treinamento, Capacitacao, Avaliacao, Documento,
+        )
         db.create_all()
 
         try:
-            from app.models import User
             if not User.query.first():
                 users = [
                     User(username="admin", nome_completo="Administrador", is_admin=True),
@@ -31,7 +35,6 @@ def create_app():
             db.session.rollback()
 
         try:
-            from app.models import Departamento
             if not Departamento.query.first():
                 _seed_sample_data()
         except Exception:

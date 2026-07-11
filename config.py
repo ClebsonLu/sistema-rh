@@ -26,7 +26,8 @@ class Config:
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
         "pool_recycle": 300,
-    } if database_url else {}
+        "pool_size": 5,
+    } if database_url and database_url.startswith("postgresql") else {}
 
 
 class DevelopmentConfig(Config):
